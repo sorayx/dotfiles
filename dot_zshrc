@@ -136,3 +136,6 @@ zstyle ':completion:*' list-colors \
   'di=38;5;31' 
 
 export LS_COLORS='rs=0:di=38;5;31:ln=01;36:ex=01;32'
+
+# Ssh agent autostart
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
