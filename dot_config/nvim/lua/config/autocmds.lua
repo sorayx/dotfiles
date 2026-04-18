@@ -1,25 +1,64 @@
--- Autocmds are automatically loaded on the VeryLazy event
--- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
---
--- Add any additional autocmds here
--- with `vim.api.nvim_create_autocmd`
---
--- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
--- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 local function transparent()
-  vim.cmd([[
-    highlight Normal guibg=NONE ctermbg=NONE
-    highlight NormalNC guibg=NONE ctermbg=NONE
-    highlight SignColumn guibg=NONE ctermbg=NONE
-    highlight EndOfBuffer guibg=NONE ctermbg=NONE
-    highlight LineNr guibg=NONE ctermbg=NONE
-    highlight FoldColumn guibg=NONE ctermbg=NONE
-    highlight NormalFloat guibg=NONE ctermbg=NONE
-    highlight FloatBorder guibg=NONE ctermbg=NONE
-  ]])
+  local groups = {
+    -- generisch
+    "Normal",
+    "NormalNC",
+    "SignColumn",
+    "EndOfBuffer",
+    "LineNr",
+    "FoldColumn",
+    "NormalFloat",
+    "FloatBorder",
+    "FloatTitle",
+    "WinSeparator",
+    "WinBar",
+    "WinBarNC",
+    "StatusLine",
+    "StatusLineNC",
+    "MsgArea",
+    "MsgSeparator",
+
+    -- noice
+    "NoicePopup",
+    "NoicePopupBorder",
+    "NoiceSplit",
+    "NoiceSplitBorder",
+    "NoiceCmdlinePopup",
+    "NoiceCmdlinePopupBorder",
+    "NoiceCmdlinePopupTitle",
+
+    -- neo-tree
+    "NeoTreeNormal",
+    "NeoTreeNormalNC",
+    "NeoTreeEndOfBuffer",
+    "NeoTreeFloatBorder",
+    "NeoTreeWinSeparator",
+    "NeoTreeCursorLine",
+  }
+
+  for _, group in ipairs(groups) do
+    pcall(vim.api.nvim_set_hl, 0, group, { bg = "NONE", ctermbg = "NONE" })
+  end
+
+  -- Neo-tree rot/farbig neutralisieren
+  pcall(vim.api.nvim_set_hl, 0, "NeoTreeGitModified", { link = "NeoTreeFileName" })
+  pcall(vim.api.nvim_set_hl, 0, "NeoTreeModified", { link = "NeoTreeFileName" })
 end
 
 vim.api.nvim_create_autocmd("ColorScheme", {
   callback = transparent,
 })
+
+vim.api.nvim_create_autocmd({ "TermOpen", "FileType" }, {
+  callback = function(args)
+    local ft = vim.bo[args.buf].filetype
+    local bt = vim.bo[args.buf].buftype
+
+    if bt == "terminal" or ft == "neo-tree" or ft == "snacks_terminal" then
+      vim.opt_local.winbar = ""
+      vim.opt_local.statusline = ""
+    end
+  end,
+})
+
 transparent()
